@@ -1,6 +1,6 @@
 /**
  *  \file openag_gc0011.h
- *  \brief Sensor module for co2 count parts per million or percentage.
+ *  \brief Sensor module for co2 count parts per million
  */
 
 #ifndef OPENAG_GC0011_H
@@ -11,8 +11,6 @@
 #else
  #include "WProgram.h"
 #endif
-
-#include <SoftwareSerial.h>
 
 // 8 MHz(ish) AVR ---------------------------------------------------------
 #if (F_CPU >= 7400000UL) && (F_CPU <= 9500000UL)
@@ -29,9 +27,10 @@
 
 #include <openag_module.h>
 #include <std_msgs/Float32.h>
+#include <SoftwareSerial.h>
 
 /**
- *  \brief Sensor module for air temperature and humidity.
+ *  \brief Sensor module for measuring ambient co2
  */
 class Gc0011 : public Module {
   public:
@@ -39,7 +38,8 @@ class Gc0011 : public Module {
     Gc0011(int rx_pin, int tx_pin);
     void begin();
     void update();
-    bool get_co2(stdmsgs::Float32 &msg);
+    bool get_carbon_dioxide(std_msgs::Float32 &msg);
+
 
   private:
     // Private Functions
@@ -47,20 +47,19 @@ class Gc0011 : public Module {
     bool readSensor();
 
     // Private Variables
-    String val;
-    double multiplier;
-    uint8_t buffer[25];
-    uint8_t ind;
-    
     int _rx_pin;
     int _tx_pin;
-    float _co2;
-    bool _send_co2;
+    float _carbon_dioxide;
+    bool _send_carbon_dioxide;
     uint32_t _time_of_last_reading;
     const uint32_t _min_update_interval = 2000;
+    SoftwareSerial *_my_serial;
 
-    uint8_t _data[6];
-    uint8_t _count;
+    String val;
+    String message;
+    double multiplier;
+    uint8_t buffer[25];
+    uint8_t _ind;
     uint32_t _last_read_time;
     bool _first_reading;
 

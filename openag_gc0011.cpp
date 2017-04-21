@@ -5,7 +5,7 @@
  */
 #include "openag_gc0011.h"
 
-Gc0011::Gc0011(int rx_pin, tx_pin) {
+Gc0011::Gc0011(int rx_pin, int tx_pin) {
   _rx_pin = rx_pin;
   _tx_pin = tx_pin;
   status_level = OK;
@@ -16,12 +16,15 @@ Gc0011::Gc0011(int rx_pin, tx_pin) {
       // up to 2% =1
       // up to 65% = 10
       //up to 100% = 100;
-  ind =0;
+  _ind=0;
+  SoftwareSerial _my_serial(_rx_pin, _tx_pin); //connect with sensor
 }
 
 void Gc0011::begin() {
-  SoftwareSerial mySerial(_rx_pin, _tx_pin); //connect with sensor
-  _count = COUNT;
+  _my_serial->begin(9600);
+  delay(500);
+  _my_serial->println("K 2"); // Set to polling mode
+  delay(500);
   _first_reading = true;
   _time_of_last_reading = 0;
 }
@@ -33,10 +36,10 @@ void Gc0011::update() {
   }
 }
 
-bool Gc0011::get_co2(std_msgs::Float32 &msg) {
-  msg.data = _co2;
-  bool res = _send_co2;
-  _send_co2 = false;
+bool Gc0011::get_carbon_dioxide(std_msgs::Float32 &msg) {
+  msg.data = _carbon_dioxide;
+  bool res = _send_carbon_dioxide;
+  _send_carbon_dioxide = false;
   return res;
 }
 
@@ -49,8 +52,8 @@ void Gc0011::getData(void) {
       status_msg = "";
     }
 
-    co2 = (multiplier * val.toInt());
-    _send_co2 = true;
+    _carbon_dioxide = (multiplier * val.toInt());
+    _send_carbon_dioxide = true;
   }
   else {
     status_level = ERROR;
@@ -62,9 +65,9 @@ void Gc0011::getData(void) {
 bool Gc0011::readSensor() {
   uint8_t last_state = HIGH;
   uint8_t counter = 0;
-  uint8_t j = 0, i;
+  uint8_t i;
   unsigned long current_time;
-
+  _carbon_dioxide = 0;
   current_time = millis();
   if (current_time < _last_read_time) {
     // ie there was a rollover
@@ -75,7 +78,18 @@ bool Gc0011::readSensor() {
   }
   _first_reading = false;
   _last_read_time = millis();
-  
+
+  _my_serial->println("Z");
+  //We read incoming bytes into a buffer until we get '0x0A' which is the ASCII value for new-line
+  while(buffer[_ind-1] != 0x0A)
+  {
+    if(_my_serial->available())
+    {
+      buffer[_ind] = _my_serial->read();
+      _ind++;
+    }
+  }
+
   /*
     Cycle through the buffer and send out each byte including the final linefeed
     each packet in the stream looks like "Z 00400 z 00360"
@@ -84,7 +98,7 @@ bool Gc0011::readSensor() {
     We are really only interested in the filtered value
   */
 
-   for(int i=0; i < ind+1; i++) {
+   for(int i=0; i < _ind+1; i++) {
       if(buffer[i] == 'z') //once we hit the 'z' we can stop
       break;
       if((buffer[i] != 0x5A)&&(buffer[i] != 0x20)) //ignore 'Z' and white space
@@ -94,13 +108,14 @@ bool Gc0011::readSensor() {
         // example the character '9' has an ASCII value of 57. [57-48=9]
       }
    }
-   
-   co2 = (multiplier * val.toInt()); //now we multiply the value by a factor specific ot the sensor. see the Cozir software guide
-   ind=0; //Reset the buffer index to overwrite the previous packet
+
+   _carbon_dioxide = (multiplier * val.toInt()); //now we multiply the value by a factor specific ot the sensor. see the Cozir software guide
+   _ind=0; //Reset the buffer index to overwrite the previous packet
    val=""; //Reset the value string
 
   // check we read a value
-  if ((co2 > 0) {
+  if (_carbon_dioxide > 0) {
+    _send_carbon_dioxide = true;
     return true;
   }
   return false;
