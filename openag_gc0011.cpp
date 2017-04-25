@@ -63,9 +63,6 @@ void Gc0011::getData(void) {
 }
 
 bool Gc0011::readSensor() {
-  uint8_t last_state = HIGH;
-  uint8_t counter = 0;
-  uint8_t i;
   unsigned long current_time;
   _carbon_dioxide = 0;
   current_time = millis();
