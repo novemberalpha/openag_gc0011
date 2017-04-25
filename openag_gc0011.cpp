@@ -36,7 +36,7 @@ void Gc0011::update() {
   }
 }
 
-bool Gc0011::get_carbon_dioxide(std_msgs::Float32 &msg) {
+bool Gc0011::get_air_carbon_dioxide(std_msgs::Float32 &msg) {
   msg.data = _carbon_dioxide;
   bool res = _send_carbon_dioxide;
   _send_carbon_dioxide = false;
