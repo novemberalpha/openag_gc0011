@@ -1,0 +1,14 @@
+{
+   "_id": "gc0011_1",
+   "type": "gc0011",
+   "environment": "environment_1",
+   "arguments": [
+       12,
+       11
+   ],
+   "outputs": {
+       "air_carbon_dioxide": {
+           "variable": "air_carbon_dioxide"
+       }
+   }
+}
