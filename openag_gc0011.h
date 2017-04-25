@@ -38,7 +38,7 @@ class Gc0011 : public Module {
     Gc0011(int rx_pin, int tx_pin);
     void begin();
     void update();
-    bool get_carbon_dioxide(std_msgs::Float32 &msg);
+    bool get_air_carbon_dioxide(std_msgs::Float32 &msg);
 
 
   private:
