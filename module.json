@@ -1,6 +1,6 @@
 {
     "header_file": "openag_gc0011.h",
-    "class_name": "gc0011",
+    "class_name": "Gc0011",
     "arguments": [
         {
             "name": "rx_pin",

@@ -1,16 +1,13 @@
-# openag_gc0011
-A derivative of [openag_gc0012](https://github.com/OpenAgInitiative/openag_gc0012)
+# openag_gc0012
 
-OpenAg firmware for the COZIR GC-0011 Carbon dioxide sensor.
+OpenAg firmware for the COZIR GC-0012 Carbon dioxide sensor.
 
-Specifically written for the PFC1 BOM. 
+Note: this firmware works for multiple COZIR C02 sensors:
 
-This code uses specifiable pins with Software Serial instead of hardware serial ports on the Arduino Mega as with [openag_gc0012](https://github.com/OpenAgInitiative/openag_gc0012).
-
-Supports:
-- GC-0010
 - GC-0011
 - GC-0012
+
+It has not been tested on the GC-0010, but probably works with it as well.
 
 ## Status Messages
 

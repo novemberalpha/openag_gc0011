@@ -1,7 +1,7 @@
 {
     "name": "openag_gc0011",
     "keywords": "openag, gc0011",
-    "description": "OpenAg driver for the GC-0011 CO2 sensor from PFC1 BOM",
+    "description": "OpenAg driver for the GC-0011 CO2 sensor for PFC1 BOM",
     "repository": {
         "type": "git",
         "url": "https://github.com/novemberalpha/openag_gc0011.git"
