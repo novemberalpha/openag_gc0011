@@ -8,6 +8,7 @@
 #include "Arduino.h"
 #include <openag_module.h>
 #include <std_msgs/Float32.h>
+#include <SoftwareSerial.h>
 
 /**
  * \brief Carbon dioxide sensor
