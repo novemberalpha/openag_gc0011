@@ -14,10 +14,6 @@ Gc0011::Gc0011(int rx_pin, int tx_pin) {
   status_msg = "";
   _send_carbon_dioxide = false;
   _time_of_last_reading = 0;
-  _first_reading = true;
-  
-  val= ""; //holds the string of the value
-  _ind=0;
   SoftwareSerial _my_serial(_rx_pin, _tx_pin); //connect with sensor
 }
 
@@ -26,7 +22,7 @@ void Gc0011::begin() {
   _my_serial->begin(9600);
   
   // Set operation mode
-  _my_serial->print("K 2\r\n"); // Set to polling mode
+  _my_serial->print("K 2\r\n"); // enable to polling mode
 }
 
 bool Gc0011::get_air_carbon_dioxide(std_msgs::Float32 &msg) {
