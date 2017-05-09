@@ -6,15 +6,13 @@
 #include "openag_gc0011.h"
 
 Gc0011::Gc0011(int rx_pin, int tx_pin) {
-  _rx_pin = rx_pin;
-  _tx_pin = tx_pin;
   
   status_level = OK;
   status_code = CODE_OK;
   status_msg = "";
   _send_carbon_dioxide = false;
   _time_of_last_reading = 0;
-  SoftwareSerial _my_serial(_rx_pin, _tx_pin); //connect with sensor
+  SoftwareSerial _my_serial(rx_pin, tx_pin); //connect with sensor
 }
 
 void Gc0011::begin() {
