@@ -8,32 +8,25 @@
 Gc0011::Gc0011(int rx_pin, int tx_pin) {
   _rx_pin = rx_pin;
   _tx_pin = tx_pin;
+  
   status_level = OK;
   status_code = CODE_OK;
   status_msg = "";
+  _send_carbon_dioxide = false;
+  _time_of_last_reading = 0;
+  _first_reading = true;
+  
   val= ""; //holds the string of the value
-  multiplier = 1; //each range of sensor has a different value.
-      // up to 2% =1
-      // up to 65% = 10
-      //up to 100% = 100;
   _ind=0;
   SoftwareSerial _my_serial(_rx_pin, _tx_pin); //connect with sensor
 }
 
 void Gc0011::begin() {
+  // Enable serial port
   _my_serial->begin(9600);
-  delay(500);
-  _my_serial->println("K 2"); // Set to polling mode
-  delay(500);
-  _first_reading = true;
-  _time_of_last_reading = 0;
-}
-
-void Gc0011::update() {
-  if (millis() - _time_of_last_reading > _min_update_interval) {
-    getData();
-    _time_of_last_reading = millis();
-  }
+  
+  // Set operation mode
+  _my_serial->print("K 2\r\n"); // Set to polling mode
 }
 
 bool Gc0011::get_air_carbon_dioxide(std_msgs::Float32 &msg) {
@@ -43,77 +36,30 @@ bool Gc0011::get_air_carbon_dioxide(std_msgs::Float32 &msg) {
   return res;
 }
 
-
-void Gc0011::getData(void) {
-  if (readSensor()) {
-    if (status_level != OK) {
-      status_level = OK;
-      status_code = CODE_OK;
-      status_msg = "";
-    }
-
-    _carbon_dioxide = (multiplier * val.toInt());
-    _send_carbon_dioxide = true;
-  }
-  else {
-    status_level = ERROR;
-    status_code = CODE_FAILED_TO_READ;
-    status_msg = "Failed to read from sensor";
+void Gc0011::update() {
+  if (millis() - _time_of_last_reading > _min_update_interval) {
+    readData();
+    _time_of_last_reading = millis();
   }
 }
 
-bool Gc0011::readSensor() {
-  unsigned long current_time;
-  _carbon_dioxide = 0;
-  current_time = millis();
-  if (current_time < _last_read_time) {
-    // ie there was a rollover
-    _last_read_time = 0;
+void Gc0011::readData() {
+  // Read sensor
+  _my_serial->print("Z\r\n");
+  String data_string = _my_serial->readStringUntil(0x0A);
+
+    // Check for failure
+  if (data_string[1] != 'Z') {
+    status_level = ERROR;
+    status_code=  CODE_FAILED_TO_READ;
+    status_msg = "Failed to read from sensor";
   }
-  if (!_first_reading && ((current_time - _last_read_time) < 2000)) {
-    return true; // return last correct measurement
-  }
-  _first_reading = false;
-  _last_read_time = millis();
-
-  _my_serial->println("Z");
-  //We read incoming bytes into a buffer until we get '0x0A' which is the ASCII value for new-line
-  while(buffer[_ind-1] != 0x0A)
-  {
-    if(_my_serial->available())
-    {
-      buffer[_ind] = _my_serial->read();
-      _ind++;
-    }
-  }
-
-  /*
-    Cycle through the buffer and send out each byte including the final linefeed
-    each packet in the stream looks like "Z 00400 z 00360"
-    'Z' lets us know its a co2 reading. the first number is the filtered value
-    and the number after the 'z' is the raw value.
-    We are really only interested in the filtered value
-  */
-
-   for(int i=0; i < _ind+1; i++) {
-      if(buffer[i] == 'z') //once we hit the 'z' we can stop
-      break;
-      if((buffer[i] != 0x5A)&&(buffer[i] != 0x20)) //ignore 'Z' and white space
-      {
-        val += buffer[i]-48; //because we break at 'z' the only bytes getting added are the numbers
-        // we subtract 48 to get to the actual numerical value
-        // example the character '9' has an ASCII value of 57. [57-48=9]
-      }
-   }
-
-   _carbon_dioxide = (multiplier * val.toInt()); //now we multiply the value by a factor specific ot the sensor. see the Cozir software guide
-   _ind=0; //Reset the buffer index to overwrite the previous packet
-   val=""; //Reset the value string
-
-  // check we read a value
-  if (_carbon_dioxide > 0) {
+  else { //  good reading
+    status_level = OK;
+    status_code = CODE_OK;
+    status_msg = "";
+    _carbon_dioxide = (float)(data_string.substring(3,8).toInt());
+    _carbon_dioxide = round(_carbon_dioxide / 10) * 10;
     _send_carbon_dioxide = true;
-    return true;
   }
-  return false;
 }
