@@ -25,27 +25,12 @@ class Gc0011 : public Module {
 
 
   private:
-    // Private Functions
-    void getData();
-    bool readSensor();
-
-    // Private Variables
-    int _rx_pin;
-    int _tx_pin;
- 
+    // Private Variables 
     float _carbon_dioxide;
     bool _send_carbon_dioxide;
     uint32_t _time_of_last_reading;
     const uint32_t _min_update_interval = 2000;
     SoftwareSerial *_my_serial;
-
-//     String val;
-//     String message;
-//     double multiplier;
-//     uint8_t buffer[25];
-//     uint8_t _ind;
-//     uint32_t _last_read_time;
-//     bool _first_reading;
  
     // Private functions
     void readData();
