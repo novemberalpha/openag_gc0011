@@ -6,7 +6,6 @@
 #include "openag_gc0011.h"
 
 Gc0011::Gc0011(int rx_pin, int tx_pin) {
-  
   status_level = OK;
   status_code = CODE_OK;
   status_msg = "";
@@ -17,15 +16,26 @@ Gc0011::Gc0011(int rx_pin, int tx_pin) {
 
 void Gc0011::begin() {
   // Enable serial port
-  _my_serial->begin(9600);
+  _my_serial.begin(9600);
+  _my_serial.println("K 2"); // enable to polling mode
   
-  // Set operation mode
-  _my_serial->print("K 2\r\n"); // enable to polling mode
+//   delay(1000);
+
+//  // Set operation mode
+//  _my_serial->println("K 2"); // enable to polling mode
+//   delay(1000);
 }
 
-bool Gc0011::get_air_carbon_dioxide(std_msgs::Float32 &msg) {
-  msg.data = _carbon_dioxide;
-  bool res = _send_carbon_dioxide;
+//bool Gc0011::get_air_carbon_dioxide(std_msgs::Float32 &msg) {
+bool Gc0011::get_air_carbon_dioxide(float &msg) {
+
+//  msg.data = _carbon_dioxide;
+    readData();
+    msg = _carbon_dioxide;
+
+    
+//  bool res = _send_carbon_dioxide;
+  bool res = true;
   _send_carbon_dioxide = false;
   return res;
 }
@@ -39,9 +49,9 @@ void Gc0011::update() {
 
 void Gc0011::readData() {
   // Read sensor
+  _carbon_dioxide++;
   _my_serial->print("Z\r\n");
   String data_string = _my_serial->readStringUntil(0x0A);
-
     // Check for failure
   if (data_string[1] != 'Z') {
     status_level = ERROR;

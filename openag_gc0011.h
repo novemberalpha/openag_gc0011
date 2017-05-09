@@ -1,3 +1,6 @@
+#include <ArduinoHardware.h>
+#include <ros.h>
+
 /**
  *  \file openag_gc0011.h
  *  \brief Carbon Dioxide Sensor for PFC1 BOM
@@ -6,7 +9,8 @@
 #ifndef OPENAG_GC0011_H
 #define OPENAG_GC0011_H
 
-#include "Arduino.h"
+//#include "Arduino.h"
+
 #include <openag_module.h>
 #include <std_msgs/Float32.h>
 #include <SoftwareSerial.h>
@@ -21,7 +25,9 @@ class Gc0011 : public Module {
     // Public Functions
     void begin();
     void update();
-    bool get_air_carbon_dioxide(std_msgs::Float32 &msg);
+//    bool get_air_carbon_dioxide(std_msgs::Float32 &msg);
+    bool get_air_carbon_dioxide(float &msg);
+
 
 
   private:

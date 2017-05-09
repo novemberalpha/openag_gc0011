@@ -1,3 +1,4 @@
+
 /*
  Cozir Sample code
  Written by: Jason Berger ( for Co2meter.com)
@@ -17,9 +18,20 @@
  
 #include "openag_gc0011.h"
 
-String message = "";
-String parameters[] = {"1"};
-Gc0011 gc0011_1("gc0011_1", parameters);
+Gc0011 gc0011_1(12, 11);
+std_msgs::Float32 gc0011_1_air_carbon_dioxide_msg;
+float co2;
+
+uint32_t last_status_read = 0;
+
+bool should_read_statuses() {
+  uint32_t curr_time = millis();
+  bool res = (curr_time - last_status_read) > 1000;
+  if (res) {
+    last_status_read = curr_time;
+  }
+  return res;
+}
 
 void setup() {
   Serial.begin(9600);
@@ -27,6 +39,12 @@ void setup() {
 }
 
 void loop() {
-  delay(1000);
+  gc0011_1.update();
+  if (should_read_statuses()) {
+    if (gc0011_1.get_air_carbon_dioxide(co2)) {
+      Serial.println("+");
+      Serial.println(co2);
+    }
+  }
 }
 
