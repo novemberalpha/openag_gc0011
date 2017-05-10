@@ -20,7 +20,6 @@
 
 Gc0011 gc0011_1(12, 11);
 std_msgs::Float32 gc0011_1_air_carbon_dioxide_msg;
-float co2;
 
 uint32_t last_status_read = 0;
 
@@ -41,9 +40,9 @@ void setup() {
 void loop() {
   gc0011_1.update();
   if (should_read_statuses()) {
-    if (gc0011_1.get_air_carbon_dioxide(co2)) {
-      Serial.println("+");
-      Serial.println(co2);
+    Serial.println(gc0011_1.get_air_carbon_dioxide(gc0011_1_air_carbon_dioxide_msg));
+    if (gc0011_1.get_air_carbon_dioxide(gc0011_1_air_carbon_dioxide_msg)) {
+      Serial.println("Success");
     }
   }
 }

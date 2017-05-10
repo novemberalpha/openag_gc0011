@@ -1,3 +1,6 @@
+#include <ArduinoHardware.h>
+#include <ros.h>
+
 /**
  *  \file openag_gc0011.h
  *  \brief Carbon Dioxide Sensor for PFC1 BOM

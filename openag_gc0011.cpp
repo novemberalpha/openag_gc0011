@@ -18,7 +18,8 @@ void Gc0011::begin() {
   _serial_port->begin(9600);
 
   // Set operation mode
-  _serial_port->print("K 2\r\n"); // enable polling mode
+//  _serial_port->print("K 2\r\n"); // enable polling mode
+//  ^^^^^ THIS IS DISABLED BECAUSE IT FREEZES THE APP
 }
 
 bool Gc0011::get_air_carbon_dioxide(std_msgs::Float32 &msg) {
@@ -51,7 +52,7 @@ void Gc0011::readData() {
     status_code = CODE_OK;
     status_msg = "";
     _carbon_dioxide = (float)(data_string.substring(3,8).toInt());
-    // _carbon_dioxide = round(_carbon_dioxide / 10) * 10;
+     _carbon_dioxide = round(_carbon_dioxide / 10) * 10;
     _send_carbon_dioxide = true;
   }
 }
